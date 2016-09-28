@@ -5,6 +5,8 @@
 #include <vector>
 #include <algorithm>
 #include <iterator>
+#include <cassert>
+
 using std::abs;
 using std::max;
 using std::vector;
@@ -23,7 +25,23 @@ struct Hex
     const int q;
     const int r;
     const int s;
-    Hex(int q_, int r_, int s_): q(q_), r(r_), s(s_) {}
+    Hex(int q_, int r_, int s_): q(q_), r(r_), s(s_) 
+    { 
+      assert(q_ + r_ + s_ == 0); 
+    }
+
+    Hex operator+ (const Hex &rhs) const {
+        return Hex(q + rhs.q, r + rhs.r, s + rhs.s);
+    }
+    Hex operator- (const Hex &rhs) const
+    {
+        return Hex(q - rhs.q, r - rhs.r, s - rhs.s);
+    }
+    Hex operator* (int rhs) const
+    {
+        return Hex(q * rhs, r * rhs, s * rhs);
+    }
+    
 };
 
 
@@ -70,25 +88,6 @@ struct Layout
 
 // Forward declarations
 
-
-Hex hex_add(Hex a, Hex b)
-{
-    return Hex(a.q + b.q, a.r + b.r, a.s + b.s);
-}
-
-
-Hex hex_subtract(Hex a, Hex b)
-{
-    return Hex(a.q - b.q, a.r - b.r, a.s - b.s);
-}
-
-
-Hex hex_scale(Hex a, int k)
-{
-    return Hex(a.q * k, a.r * k, a.s * k);
-}
-
-
 const vector<Hex> hex_directions = {Hex(1, 0, -1), Hex(1, -1, 0), Hex(0, -1, 1), Hex(-1, 0, 1), Hex(-1, 1, 0), Hex(0, 1, -1)};
 Hex hex_direction(int direction)
 {
@@ -98,14 +97,14 @@ Hex hex_direction(int direction)
 
 Hex hex_neighbor(Hex hex, int direction)
 {
-    return hex_add(hex, hex_direction(direction));
+    return (hex + hex_direction(direction));
 }
 
 
 const vector<Hex> hex_diagonals = {Hex(2, -1, -1), Hex(1, -2, 1), Hex(-1, -1, 2), Hex(-2, 1, 1), Hex(-1, 2, -1), Hex(1, 1, -2)};
 Hex hex_diagonal_neighbor(Hex hex, int direction)
 {
-    return hex_add(hex, hex_diagonals[direction]);
+    return (hex + hex_diagonals[direction]);
 }
 
 
@@ -117,7 +116,7 @@ int hex_length(Hex hex)
 
 int hex_distance(Hex a, Hex b)
 {
-    return hex_length(hex_subtract(a, b));
+    return hex_length((a - b));
 }
 
 
@@ -305,8 +304,9 @@ void equal_hex_array(const char* name, vector<Hex> a, vector<Hex> b)
 
 void test_hex_arithmetic()
 {
-    equal_hex("hex_add", Hex(4, -10, 6), hex_add(Hex(1, -3, 2), Hex(3, -7, 4)));
-    equal_hex("hex_subtract", Hex(-2, 4, -2), hex_subtract(Hex(1, -3, 2), Hex(3, -7, 4)));
+    equal_hex("hex_add", Hex(4, -10, 6), (Hex(1, -3, 2) + Hex(3, -7, 4)));
+    equal_hex("hex_subtract", Hex(-2, 4, -2), (Hex(1, -3, 2) - Hex(3, -7, 4)));
+    equal_hex("hex_subtract", Hex(-3, 9, -6), (Hex(1, -3, 2) * -3));
 }
 
 
