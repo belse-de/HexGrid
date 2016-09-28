@@ -41,6 +41,14 @@ struct Hex
     {
         return Hex(q * rhs, r * rhs, s * rhs);
     }
+    bool operator == (const Hex &rhs) const
+    {
+        return q == rhs.q && r == rhs.r && s == rhs.s;
+    }
+    bool operator != (const Hex &rhs) const
+    {
+        return !(*this == rhs);
+    }
     
 };
 
