@@ -50,6 +50,16 @@ struct Hex
         return !(*this == rhs);
     }
     
+    
+    int length()
+    {
+        return int((abs(q) + abs(r) + abs(s)) / 2);
+    }
+    int distance(const Hex &rhs) const
+    {
+        return length((*this - rhs));
+    }
+    
 };
 
 
@@ -116,16 +126,7 @@ Hex hex_diagonal_neighbor(Hex hex, int direction)
 }
 
 
-int hex_length(Hex hex)
-{
-    return int((abs(hex.q) + abs(hex.r) + abs(hex.s)) / 2);
-}
 
-
-int hex_distance(Hex a, Hex b)
-{
-    return hex_length((a - b));
-}
 
 
 
