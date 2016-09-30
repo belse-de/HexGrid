@@ -8,6 +8,7 @@ using std::vector;
 struct Layout;
 struct Hex;
 struct FractionalHex;
+struct OffsetCoord;
 
 struct Point
 {
@@ -45,6 +46,8 @@ struct Layout
     const Point size;
     const Point origin;
     Layout(Orientation orientation_, Point size_, Point origin_);
+    
+    Point corner_offset(int corner);
 };
 
 
@@ -84,6 +87,10 @@ struct Hex: public Vec3<int>
     
     vector<Hex> drawLine(Hex to);
     Point point(const Layout &layout);
+    vector<Point> polygon_corners(Layout layout);
+    
+    OffsetCoord qoffset(int offset);
+    OffsetCoord roffset(int offset);
 };
 
 struct FractionalHex: public Vec3<float>
@@ -101,6 +108,9 @@ struct OffsetCoord
     const int col;
     const int row;
     OffsetCoord(int col_, int row_);
+    
+    Hex qoffset(int offset);
+    Hex roffset(int offset);
 };
 
 

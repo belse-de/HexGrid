@@ -153,6 +153,34 @@ Point Hex::point(const Layout &layout)
    
 }
 
+vector<Point> Hex::polygon_corners(Layout layout)
+{
+    vector<Point> corners = {};
+    Point center = point(layout);
+    for (int i = 0; i < 6; i++)
+    {
+        Point offset = layout.corner_offset(i);
+        corners.push_back(Point(center.x + offset.x, center.y + offset.y));
+    }
+    return corners;
+}
+
+OffsetCoord Hex::qoffset(int offset)
+{
+    int col = q;
+    int row = r + int((q + offset * (q & 1)) / 2);
+    return OffsetCoord(col, row);
+}
+
+
+OffsetCoord Hex::roffset(int offset)
+{
+    int col = q + int((r + offset * (r & 1)) / 2);
+    int row = r;
+    return OffsetCoord(col, row);
+}
+
+
 FractionalHex::FractionalHex(float q_, float r_, float s_) : Vec3<float>(q_, r_, s_) {}
 FractionalHex::FractionalHex(const Vec3<float> &orig)      : Vec3<float>(orig.q, orig.r, orig.s) {}
 FractionalHex::FractionalHex(const FractionalHex &orig )   : FractionalHex( static_cast<Vec3<float>>(orig) ) {}
@@ -193,6 +221,23 @@ FractionalHex FractionalHex::lerp(const FractionalHex &rhs, float t) const
 
 OffsetCoord::OffsetCoord(int col_, int row_): col(col_), row(row_) {}
 
+Hex OffsetCoord::qoffset(int offset)
+{
+    int q = col;
+    int r = row - int((col + offset * (col & 1)) / 2);
+    int s = -q - r;
+    return Hex(q, r, s);
+}
+
+Hex OffsetCoord::roffset(int offset)
+{
+    int q = col - int((row + offset * (row & 1)) / 2);
+    int r = row;
+    int s = -q - r;
+    return Hex(q, r, s);
+}
+
+
 Orientation::Orientation(
         double f0_, double f1_, double f2_, double f3_, 
         double b0_, double b1_, double b2_, double b3_, 
@@ -207,3 +252,13 @@ const Orientation Layout::flat   = Orientation(3.0 / 2.0, 0.0, sqrt(3.0) / 2.0, 
 
 Layout::Layout(Orientation orientation_, Point size_, Point origin_): 
         orientation(orientation_), size(size_), origin(origin_) {}
+        
+Point Layout::corner_offset(int corner)
+{
+    corner = (6 + (corner % 6)) % 6;
+    assert(corner >= 0 && corner < 6);
+    
+    Orientation M = orientation;
+    double angle = 2.0 * M_PI * (M.start_angle - corner) / 6;
+    return Point(size.x * cos(angle), size.y * sin(angle));
+}
