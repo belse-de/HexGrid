@@ -107,28 +107,28 @@ void test_conversion_roundtrip()
 {
     Hex a = Hex(3, 4, -7);
     OffsetCoord b = OffsetCoord(1, -3);
-    equal_Hex("conversion_roundtrip even-q",         a, a.qoffset(EVEN).qoffset(EVEN) );
-    equal_offsetcoord("conversion_roundtrip even-q", b, b.qoffset(EVEN).qoffset(EVEN) );
-    equal_Hex("conversion_roundtrip odd-q",          a, a.qoffset(ODD).qoffset(ODD) );
-    equal_offsetcoord("conversion_roundtrip odd-q",  b, b.qoffset(ODD).qoffset(ODD) );
-    equal_Hex("conversion_roundtrip even-r",         a, a.roffset(EVEN).roffset(EVEN) );
-    equal_offsetcoord("conversion_roundtrip even-r", b, b.roffset(EVEN).roffset(EVEN) );
-    equal_Hex("conversion_roundtrip odd-r",          a, a.roffset(ODD).roffset(ODD) );
-    equal_offsetcoord("conversion_roundtrip odd-r",  b, b.roffset(ODD).roffset(ODD) );
+    equal_Hex("conversion_roundtrip even-q",         a, a.hex2qoffset(EVEN).qoffset2hex(EVEN) );
+    equal_offsetcoord("conversion_roundtrip even-q", b, b.qoffset2hex(EVEN).hex2qoffset(EVEN) );
+    equal_Hex("conversion_roundtrip odd-q",          a, a.hex2qoffset(ODD).qoffset2hex(ODD) );
+    equal_offsetcoord("conversion_roundtrip odd-q",  b, b.qoffset2hex(ODD).hex2qoffset(ODD) );
+    equal_Hex("conversion_roundtrip even-r",         a, a.hex2roffset(EVEN).roffset2hex(EVEN) );
+    equal_offsetcoord("conversion_roundtrip even-r", b, b.roffset2hex(EVEN).hex2roffset(EVEN) );
+    equal_Hex("conversion_roundtrip odd-r",          a, a.hex2roffset(ODD).roffset2hex(ODD) );
+    equal_offsetcoord("conversion_roundtrip odd-r",  b, b.roffset2hex(ODD).hex2roffset(ODD) );
 }
 
 
 void test_offset_from_cube()
 {
-    equal_offsetcoord("offset_from_cube even-q", OffsetCoord(1, 3), Hex(1, 2, -3).qoffset(EVEN) );
-    equal_offsetcoord("offset_from_cube odd-q",  OffsetCoord(1, 2), Hex(1, 2, -3).qoffset(ODD)  );
+    equal_offsetcoord("offset_from_cube even-q", OffsetCoord(1, 3), Hex(1, 2, -3).hex2qoffset(EVEN) );
+    equal_offsetcoord("offset_from_cube odd-q",  OffsetCoord(1, 2), Hex(1, 2, -3).hex2qoffset(ODD)  );
 }
 
 
 void test_offset_to_cube()
 {
-    equal_Hex("offset_to_cube even-", Hex(1, 2, -3), OffsetCoord(1, 3).qoffset(EVEN) );
-    equal_Hex("offset_to_cube odd-q", Hex(1, 2, -3), OffsetCoord(1, 2).qoffset(ODD)  );
+    equal_Hex("offset_to_cube even-", Hex(1, 2, -3), OffsetCoord(1, 3).qoffset2hex(EVEN) );
+    equal_Hex("offset_to_cube odd-q", Hex(1, 2, -3), OffsetCoord(1, 2).qoffset2hex(ODD)  );
 }
 
 

@@ -165,7 +165,7 @@ vector<Point> Hex::polygon_corners(Layout layout)
     return corners;
 }
 
-OffsetCoord Hex::qoffset(int offset)
+OffsetCoord Hex::hex2qoffset(int offset)
 {
     int col = q;
     int row = r + int((q + offset * (q & 1)) / 2);
@@ -173,7 +173,7 @@ OffsetCoord Hex::qoffset(int offset)
 }
 
 
-OffsetCoord Hex::roffset(int offset)
+OffsetCoord Hex::hex2roffset(int offset)
 {
     int col = q + int((r + offset * (r & 1)) / 2);
     int row = r;
@@ -221,7 +221,7 @@ FractionalHex FractionalHex::lerp(const FractionalHex &rhs, float t) const
 
 OffsetCoord::OffsetCoord(int col_, int row_): col(col_), row(row_) {}
 
-Hex OffsetCoord::qoffset(int offset)
+Hex OffsetCoord::qoffset2hex(int offset)
 {
     int q = col;
     int r = row - int((col + offset * (col & 1)) / 2);
@@ -229,7 +229,7 @@ Hex OffsetCoord::qoffset(int offset)
     return Hex(q, r, s);
 }
 
-Hex OffsetCoord::roffset(int offset)
+Hex OffsetCoord::roffset2hex(int offset)
 {
     int q = col - int((row + offset * (row & 1)) / 2);
     int r = row;

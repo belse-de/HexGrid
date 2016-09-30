@@ -89,8 +89,8 @@ struct Hex: public Vec3<int>
     Point point(const Layout &layout);
     vector<Point> polygon_corners(Layout layout);
     
-    OffsetCoord qoffset(int offset);
-    OffsetCoord roffset(int offset);
+    OffsetCoord hex2qoffset(int offset);
+    OffsetCoord hex2roffset(int offset);
 };
 
 struct FractionalHex: public Vec3<float>
@@ -109,8 +109,8 @@ struct OffsetCoord
     const int row;
     OffsetCoord(int col_, int row_);
     
-    Hex qoffset(int offset);
-    Hex roffset(int offset);
+    Hex qoffset2hex(int offset);
+    Hex roffset2hex(int offset);
 };
 
 
