@@ -57,11 +57,11 @@ struct Vec3
     // Vec3(); FIXME
     Vec3(T q_, T r_, T s_);
 
-    Vec3 operator+  (const Vec3 &rhs) const;
-    Vec3 operator-  (const Vec3 &rhs) const;
-    Vec3 operator*  (T rhs) const;
-    bool operator== (const Vec3 &rhs) const;
-    bool operator!= (const Vec3 &rhs) const;
+    virtual Vec3 operator+  (const Vec3 &rhs) const;
+    virtual Vec3 operator-  (const Vec3 &rhs) const;
+    virtual Vec3 operator*  (T rhs) const;
+    virtual bool operator== (const Vec3 &rhs) const;
+    virtual bool operator!= (const Vec3 &rhs) const;
       
     T length();
     T distance(const Vec3 &rhs) const;    

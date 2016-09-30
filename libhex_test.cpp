@@ -34,7 +34,7 @@ void equal_int(const char* name, int a, int b)
 void equal_hex_array(const char* name, vector<Hex> a, vector<Hex> b)
 {
     equal_int(name, a.size(), b.size());
-    for (int i = 0; i < a.size(); i++)
+    for (unsigned int i = 0; i < a.size(); i++)
     {
         equal_Hex(name, a[i], b[i]);
     }

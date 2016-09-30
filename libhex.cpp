@@ -95,7 +95,7 @@ const vector<Hex> Hex::directions =
 Hex Hex::direction(int direction)
 {
     direction = (6 + (direction % 6)) % 6;
-    assert(0 >= direction && direction < 6);
+    assert(direction >= 0 && direction < 6);
     return directions[direction];
 }
 
@@ -129,8 +129,8 @@ Hex Hex::diagonal_neighbor(int direction)
 vector<Hex> Hex::drawLine(Hex to)
 {
     int N = distance(to);
-    FractionalHex from_nudge = FractionalHex(q + 0.000001, r + 0.000001, s - 0.000002);
-    FractionalHex to_nudge = FractionalHex(to.q + 0.000001, to.r + 0.000001, to.s - 0.000002);
+    FractionalHex from_nudge = FractionalHex(   q + 0.000001,    r + 0.000001,    s - 0.000002);
+    FractionalHex to_nudge   = FractionalHex(to.q + 0.000001, to.r + 0.000001, to.s - 0.000002);
     vector<Hex> results = {};
     double step = 1.0 / max(N, 1);
     for (int i = 0; i <= N; i++)
