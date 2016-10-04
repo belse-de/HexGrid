@@ -8,6 +8,7 @@ echo -e "\n"
 
 g++ -std=c++11 -Wall -Wextra libhex.cpp libhex_test.cpp -o libhex_test 2> g++.err
 
+head  g++.err
 wc -l g++.err
 
 ./libhex_test
