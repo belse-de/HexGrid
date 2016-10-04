@@ -4,6 +4,8 @@
 
 #include "libhex.hpp"
 
+using namespace Hexagon;
+
 void equal_Hex(const char* name, Hex a, Hex b)
 {
     if ( not (a.q == b.q and a.s == b.s and a.r == b.r))
@@ -78,12 +80,14 @@ void test_hex_round()
     FractionalHex a = FractionalHex(0, 0, 0);
     FractionalHex b = FractionalHex(1, -1, 0);
     FractionalHex c = FractionalHex(0, -1, 1);
+    
     equal_Hex("hex_round 1", Hex(5, -10, 5), 
         FractionalHex(0, 0, 0).lerp(FractionalHex(10, -20, 10), 0.5).round2hex() );
-    equal_Hex("hex_round 2", a.round2hex(), (a.lerp(b, 0.499)).round2hex());
-    equal_Hex("hex_round 3", b.round2hex(), (a.lerp(b, 0.501)).round2hex());
-    equal_Hex("hex_round 4", a.round2hex(), (FractionalHex(a.q * 0.4 + b.q * 0.3 + c.q * 0.3, a.r * 0.4 + b.r * 0.3 + c.r * 0.3, a.s * 0.4 + b.s * 0.3 + c.s * 0.3)).round2hex());
-    equal_Hex("hex_round 5", c.round2hex(), (FractionalHex(a.q * 0.3 + b.q * 0.3 + c.q * 0.4, a.r * 0.3 + b.r * 0.3 + c.r * 0.4, a.s * 0.3 + b.s * 0.3 + c.s * 0.4)).round2hex());
+    equal_Hex("hex_round 2", a.round2hex(), a.lerp(b, 0.499).round2hex());
+    equal_Hex("hex_round 3", b.round2hex(), a.lerp(b, 0.501).round2hex());
+    equal_Hex("hex_round 4", a.round2hex(), FractionalHex((a * 0.6) + (b * 0.2) + (c * 0.2)).round2hex());
+    equal_Hex("hex_round 5", c.round2hex(), FractionalHex((a * 0.2) + (b * 0.2) + (c * 0.6)).round2hex());
+    equal_Hex("hex_round 6", b.round2hex(), FractionalHex((a * 0.2) + (b * 0.6) + (c * 0.2)).round2hex());
 }
 
 

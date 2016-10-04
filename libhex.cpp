@@ -10,10 +10,11 @@
 
 using namespace Hexagon;
 //using std::abs;
-//using std::max;
+using std::max;
 //using std::vector;
 
 Point::Point(double x_, double y_): x(x_), y(y_) {}
+
 
 FractionalHex Point::hex(const Layout &layout)
 {
