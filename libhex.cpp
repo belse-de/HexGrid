@@ -1,6 +1,5 @@
 #include "libhex.hpp"
 
-
 #include <cmath>
 #include <cstdlib>
 #include <cassert>
@@ -9,9 +8,10 @@
 #include <iterator>
 
 
-using std::abs;
-using std::max;
-using std::vector;
+using namespace Hexagon;
+//using std::abs;
+//using std::max;
+//using std::vector;
 
 Point::Point(double x_, double y_): x(x_), y(y_) {}
 
@@ -262,3 +262,4 @@ Point Layout::corner_offset(int corner)
     double angle = 2.0 * M_PI * (M.start_angle - corner) / 6;
     return Point(size.x * cos(angle), size.y * sin(angle));
 }
+

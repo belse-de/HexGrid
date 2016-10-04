@@ -44,8 +44,8 @@ void equal_hex_array(const char* name, vector<Hex> a, vector<Hex> b)
 void test_hex_arithmetic()
 {
     equal_Hex("hex_add", Hex(4, -10, 6), (Hex(1, -3, 2) + Hex(3, -7, 4)));
-    equal_Hex("hex_subtract", Hex(-2, 4, -2), (Hex(1, -3, 2) - Hex(3, -7, 4)));
-    equal_Hex("hex_subtract", Hex(-3, 9, -6), (Hex(1, -3, 2) * -3));
+    equal_Hex("hex_sub", Hex(-2, 4, -2), (Hex(1, -3, 2) - Hex(3, -7, 4)));
+    equal_Hex("hex_mul", Hex(-3, 9, -6), (Hex(1, -3, 2) * -3));
 }
 
 
