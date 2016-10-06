@@ -8,7 +8,7 @@ using namespace Hexagon;
 
 void equal_Hex(const char* name, Hex a, Hex b)
 {
-    if ( not (a.q == b.q and a.s == b.s and a.r == b.r))
+    if ( not (a == b) )
     {
         perror(name);
     }

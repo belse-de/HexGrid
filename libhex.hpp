@@ -26,6 +26,9 @@ namespace Hexagon
         double f0_, double f1_, double f2_, double f3_, 
         double b0_, double b1_, double b2_, double b3_, 
         double start_angle_);
+    
+    virtual bool operator== (const Orientation &rhs) const;
+    virtual bool operator!= (const Orientation &rhs) const;
   };
   
   struct Point
@@ -33,6 +36,9 @@ namespace Hexagon
     const double x;
     const double y;
     Point(double x_, double y_);
+    
+    virtual bool operator== (const Orientation &rhs) const;
+    virtual bool operator!= (const Orientation &rhs) const;
     
     FractionalHex hex(const Layout &layout);
   };
@@ -47,6 +53,9 @@ namespace Hexagon
     const Point origin;
     Layout(Orientation orientation_, Point size_, Point origin_);
     
+    virtual bool operator== (const Orientation &rhs) const;
+    virtual bool operator!= (const Orientation &rhs) const;
+    
     Point corner_offset(int corner);
   };
   
@@ -55,6 +64,9 @@ namespace Hexagon
     const int col;
     const int row;
     OffsetCoord(int col_, int row_);
+    
+    virtual bool operator== (const Orientation &rhs) const;
+    virtual bool operator!= (const Orientation &rhs) const;
     
     Hex qoffset2hex(int offset);
     Hex roffset2hex(int offset);
