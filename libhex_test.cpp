@@ -10,7 +10,7 @@ void equal_Hex(const char* name, Hex a, Hex b)
 {
     if ( not (a == b) )
     {
-        perror(name);
+        fprintf(stderr, "%s\n",name);
     }
 }
 
@@ -19,7 +19,7 @@ void equal_offsetcoord(const char* name, OffsetCoord a, OffsetCoord b)
 {
     if ( not (a.col == b.col and a.row == b.row))
     {
-        perror(name);
+        fprintf(stderr, "%s\n",name);
     }
 }
 
@@ -28,7 +28,7 @@ void equal_int(const char* name, int a, int b)
 {
     if ( not (a == b))
     {
-        perror(name);
+        fprintf(stderr, "%s\n",name);
     }
 }
 
@@ -126,13 +126,17 @@ void test_offset_from_cube()
 {
     equal_offsetcoord("offset_from_cube even-q", OffsetCoord(1, 3), Hex(1, 2, -3).hex2qoffset(EVEN) );
     equal_offsetcoord("offset_from_cube odd-q",  OffsetCoord(1, 2), Hex(1, 2, -3).hex2qoffset(ODD)  );
+    equal_offsetcoord("offset_from_cube even-r", OffsetCoord(3, 3), Hex(1, 3, -4).hex2roffset(EVEN) );
+    equal_offsetcoord("offset_from_cube odd-r",  OffsetCoord(2, 2), Hex(1, 2, -3).hex2roffset(ODD)  );
 }
 
 
 void test_offset_to_cube()
 {
-    equal_Hex("offset_to_cube even-", Hex(1, 2, -3), OffsetCoord(1, 3).qoffset2hex(EVEN) );
-    equal_Hex("offset_to_cube odd-q", Hex(1, 2, -3), OffsetCoord(1, 2).qoffset2hex(ODD)  );
+    equal_Hex("offset_to_cube even-q", Hex(1, 2, -3), OffsetCoord(1, 3).qoffset2hex(EVEN) );
+    equal_Hex("offset_to_cube odd-q ", Hex(1, 2, -3), OffsetCoord(1, 2).qoffset2hex(ODD)  );
+    equal_Hex("offset_to_cube even-r", Hex(1, 3, -4), OffsetCoord(3, 3).roffset2hex(EVEN) );
+    equal_Hex("offset_to_cube odd-r ", Hex(1, 2, -3), OffsetCoord(2, 2).roffset2hex(ODD)  );
 }
 
 
@@ -150,9 +154,6 @@ void test_all()
     test_offset_from_cube();
     test_offset_to_cube();
 }
-
-
-
 
 
 int main() {

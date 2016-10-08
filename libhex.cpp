@@ -182,9 +182,9 @@ OffsetCoord Hex::hex2roffset(int offset)
 }
 
 
-FractionalHex::FractionalHex(float q_, float r_, float s_) : Vec3<float>(q_, r_, s_) {}
-FractionalHex::FractionalHex(const Vec3<float> &orig)      : Vec3<float>(orig.q, orig.r, orig.s) {}
-FractionalHex::FractionalHex(const FractionalHex &orig )   : FractionalHex( static_cast<Vec3<float>>(orig) ) {}
+FractionalHex::FractionalHex(double q_, double r_, double s_) : Vec3<double>(q_, r_, s_) {}
+FractionalHex::FractionalHex(const Vec3<double> &orig)      : Vec3<double>(orig.q, orig.r, orig.s) {}
+FractionalHex::FractionalHex(const FractionalHex &orig )   : FractionalHex( static_cast<Vec3<double>>(orig) ) {}
 
 
 Hex FractionalHex::round2hex() const
@@ -192,9 +192,9 @@ Hex FractionalHex::round2hex() const
     int tmp_q = int(round(q));
     int tmp_r = int(round(r));
     int tmp_s = int(round(s));
-    float q_diff = abs(tmp_q - q);
-    float r_diff = abs(tmp_r - r);
-    float s_diff = abs(tmp_s - s);
+    double q_diff = abs(tmp_q - q);
+    double r_diff = abs(tmp_r - r);
+    double s_diff = abs(tmp_s - s);
     if (q_diff > r_diff and q_diff > s_diff)
     {
         tmp_q = -tmp_r - tmp_s;
@@ -211,7 +211,7 @@ Hex FractionalHex::round2hex() const
     return Hex(tmp_q, tmp_r, tmp_s);
 }
 
-FractionalHex FractionalHex::lerp(const FractionalHex &rhs, float t) const
+FractionalHex FractionalHex::lerp(const FractionalHex &rhs, double t) const
 {
     return FractionalHex(q * (1. - t) + rhs.q * t, r * (1. - t) + rhs.r * t, s * (1. - t) + rhs.s * t);
 }

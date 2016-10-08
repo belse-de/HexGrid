@@ -27,8 +27,6 @@ namespace Hexagon
         double b0_, double b1_, double b2_, double b3_, 
         double start_angle_);
     
-    virtual bool operator== (const Orientation &rhs) const;
-    virtual bool operator!= (const Orientation &rhs) const;
   };
   
   struct Point
@@ -36,9 +34,6 @@ namespace Hexagon
     const double x;
     const double y;
     Point(double x_, double y_);
-    
-    virtual bool operator== (const Orientation &rhs) const;
-    virtual bool operator!= (const Orientation &rhs) const;
     
     FractionalHex hex(const Layout &layout);
   };
@@ -53,9 +48,6 @@ namespace Hexagon
     const Point origin;
     Layout(Orientation orientation_, Point size_, Point origin_);
     
-    virtual bool operator== (const Orientation &rhs) const;
-    virtual bool operator!= (const Orientation &rhs) const;
-    
     Point corner_offset(int corner);
   };
   
@@ -64,9 +56,6 @@ namespace Hexagon
     const int col;
     const int row;
     OffsetCoord(int col_, int row_);
-    
-    virtual bool operator== (const Orientation &rhs) const;
-    virtual bool operator!= (const Orientation &rhs) const;
     
     Hex qoffset2hex(int offset);
     Hex roffset2hex(int offset);
@@ -114,14 +103,14 @@ namespace Hexagon
     OffsetCoord hex2roffset(int offset);
   };
 
-  struct FractionalHex: public Vec3<float>
+  struct FractionalHex: public Vec3<double>
   {
-    FractionalHex(float q_, float r_, float s_);
-    FractionalHex(const Vec3<float> &orig);
+    FractionalHex(double q_, double r_, double s_);
+    FractionalHex(const Vec3<double> &orig);
     FractionalHex(const FractionalHex &orig );
     
     Hex round2hex() const;
-    FractionalHex lerp(const FractionalHex &rhs, float t) const;
+    FractionalHex lerp(const FractionalHex &rhs, double t) const;
   };
 
 
