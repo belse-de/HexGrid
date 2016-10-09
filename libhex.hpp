@@ -4,6 +4,8 @@
 
 #include <vector>
 using std::vector;
+#include <functional>
+using std::hash;
 
 #include <glm/glm.hpp>
 
@@ -48,7 +50,7 @@ namespace Hexagon
     const Point origin;
     Layout(Orientation orientation_, Point size_, Point origin_);
     
-    Point corner_offset(int corner);
+    Point corner_offset(int corner) const;
   };
   
    struct OffsetCoord : public glm::i32vec2
@@ -79,7 +81,7 @@ namespace Hexagon
     
     vector<Hex> drawLine(Hex to);
     Point point(const Layout &layout);
-    vector<Point> polygon_corners(Layout layout);
+    vector<Point> polygon_corners(const Layout &layout);
     
     OffsetCoord hex2qoffset(int offset);
     OffsetCoord hex2roffset(int offset);
@@ -101,5 +103,16 @@ const int EVEN =  1;
 const int ODD  = -1;
 
 };
+
+namespace std {
+  template <> struct hash<Hexagon::Hex> {
+    size_t operator()(const Hexagon::Hex& h) const {
+      hash<int> int_hash;
+      size_t hq = int_hash(h.x);
+      size_t hr = int_hash(h.y);
+      return hq ^ (hr + 0x9e3779b9 + (hq << 6) + (hq >> 2));
+    }
+  };
+}
 
 #endif /* LIBHEX_HPP */

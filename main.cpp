@@ -1,10 +1,14 @@
 #include <iostream>
 #include <string>
+#include <unordered_map>
+
 #include <cstdlib>
+#include <cmath>
+using std::max;
+using std::min;
 
 //#include <GL/glut.h>
 #include <GL/freeglut.h>
-
 #include <glm/glm.hpp>// glm::vec2
 #include <glm/ext.hpp>
 
@@ -16,10 +20,13 @@ static glm::vec2 windowSize = glm::vec2(600,600);
 
 // initial window position
 static glm::vec2 windowPosition = glm::vec2(100, 100);
-static glm::vec3 cameraPosition = glm::vec3(1, 1, 5);
+static glm::vec3 cameraPosition = glm::vec3(1, 1, 2.5);
 static glm::vec3 cameraUp       = glm::vec3(0, 1, 0);
 // window title
 static std::string title = "Hex Test";
+
+static int map_radius = 20;
+static std::unordered_map<Hexagon::Hex, glm::vec3> map;
 
 // display callback for GLUT
 void display(void);
@@ -53,6 +60,25 @@ int main(int argc, char **argv)
   glutCreateMenu(menu);
   glutAttachMenu(GLUT_RIGHT_BUTTON);
 # endif
+
+  // MAP init 
+  //  std::make_pair<std::string,double>("eggs",6.0)
+  
+  for (int q = -map_radius; q <= map_radius; q++) {
+    int r1 = max(-map_radius, -q - map_radius);
+    int r2 = min(map_radius, -q + map_radius);
+    for (int r = r1; r <= r2; r++) {
+      int s = -q-r;
+      float c_r = 0.5f*q/map_radius+0.5f;
+      float c_g = 0.5f*r/map_radius+0.5f;
+      float c_b = 0.5f*s/map_radius+0.5f;
+      map.insert(
+        std::make_pair<Hexagon::Hex,glm::vec3>(
+          Hexagon::Hex(q, r, s), glm::vec3( c_r, c_g, c_b)
+        )
+      );
+    }
+  } 
 
   //return on exit event to main(freeglut)
   glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
@@ -94,25 +120,45 @@ void display(void)
   glColor3f(+0.5f, +0.5f, +0.5f);
   glutWireCube(1.0);
   
-  glColor3f(+0.75f, +0.25f, +0.125f);
-  Hexagon::Layout hexLayout = Hexagon::Layout(Hexagon::Layout::pointy, Hexagon::Point(1,1), Hexagon::Point(0,0));
-  glBegin(GL_POLYGON);
-    for (int i = 0; i < 6; ++i)
-    {
-      Hexagon::Point p = hexLayout.corner_offset(i);
-      glVertex3f(p.x, p.y, +0.0f);
+  for (int q = -map_radius; q <= map_radius; q++) {
+    int r1 = max(-map_radius, -q - map_radius);
+    int r2 = min(map_radius, -q + map_radius);
+    for (int r = r1; r <= r2; r++) {
+      int s = -q-r;
+      Hexagon::Hex field = Hexagon::Hex(q, r, s);
+      glm::vec3 colour = map[field];
+
+      Hexagon::Layout hexLayout = 
+          Hexagon::Layout(
+            Hexagon::Layout::pointy, 
+            Hexagon::Point(1,1), 
+            Hexagon::Point(0,0));
+            
+      vector<Hexagon::Point> corners = field.polygon_corners(hexLayout);
+            
+      glColor3f(colour.x, colour.y, colour.z);
+      glBegin(GL_POLYGON);
+        for (auto p : corners)
+        {
+          glVertex2f(p.x, p.y);
+        }
+      glEnd();
+      
+      glLineWidth(3.0f);
+      glColor3f(+0.25f, +0.25f, +0.25f);
+      glBegin(GL_LINE_STRIP);
+        for (int i=0; i<4; i++)
+        {
+          auto p = corners[i];
+          glVertex2f(p.x, p.y);
+        }
+      glEnd();
+      glLineWidth(1.0f);
+      
     }
-  glEnd();
+  } 
   
-  glLineWidth(5.0f);
-  glColor3f(+0.5f, +0.5f, +0.5f);
-  glBegin(GL_LINE_LOOP);
-    for (int i = 0; i < 6; ++i)
-    {
-      Hexagon::Point p = hexLayout.corner_offset(i);
-      glVertex3f(p.x, p.y, +0.0f);
-    }
-  glEnd();
+  
   
  
   //display
@@ -206,7 +252,7 @@ void specialKeysPressed(int key, int x, int y)
       cameraPosition.z -= 0.125f;
       break;
     case GLUT_KEY_HOME:
-      cameraPosition = glm::vec3(0, 0, 10);
+      cameraPosition = glm::vec3(0, 0, 80);
       break;
       
     case GLUT_KEY_END:

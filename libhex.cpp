@@ -130,7 +130,7 @@ Point Hex::point(const Layout &layout)
    
 }
 
-vector<Point> Hex::polygon_corners(Layout layout)
+vector<Point> Hex::polygon_corners(const Layout &layout)
 {
     vector<Point> corners = {};
     Point center = point(layout);
@@ -230,7 +230,7 @@ const Orientation Layout::flat   = Orientation(3.0 / 2.0, 0.0, sqrt(3.0) / 2.0, 
 Layout::Layout(Orientation orientation_, Point size_, Point origin_): 
         orientation(orientation_), size(size_), origin(origin_) {}
         
-Point Layout::corner_offset(int corner)
+Point Layout::corner_offset(int corner) const
 {
     corner = (6 + (corner % 6)) % 6;
     assert(corner >= 0 && corner < 6);
