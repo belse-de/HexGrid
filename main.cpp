@@ -1,3 +1,4 @@
+#include <iostream>
 #include <string>
 #include <cstdlib>
 
@@ -5,6 +6,7 @@
 #include <GL/freeglut.h>
 
 #include <glm/glm.hpp>// glm::vec2
+#include <glm/ext.hpp>
 
 #include "libhex.hpp"
 
@@ -14,7 +16,7 @@ static glm::vec2 windowSize = glm::vec2(600,600);
 
 // initial window position
 static glm::vec2 windowPosition = glm::vec2(100, 100);
-static glm::vec3 cameraPosition = glm::vec3(0, 0, 10);
+static glm::vec3 cameraPosition = glm::vec3(1, 1, 5);
 static glm::vec3 cameraUp       = glm::vec3(0, 1, 0);
 // window title
 static std::string title = "Hex Test";
@@ -75,14 +77,6 @@ void display(void)
       cameraPosition.x, cameraPosition.y, cameraPosition.z, 
       0.0, 0.0, 0.0, 
       cameraUp.x, cameraUp.y, cameraUp.z);
-  
-  glColor3f(+1.0f, +1.0f, +1.0f);
-  glBegin(GL_QUADS); //Begin quadrilateral coordinates
-	  glVertex3f(+1.5f, +1.5f, -5.0f);
-	  glVertex3f(-1.5f, +1.5f, -5.0f);
-	  glVertex3f(-1.5f, -1.5f, -5.0f);
-	  glVertex3f(+1.5f, -1.5f, -5.0f);
-	glEnd(); //End quadrilateral coordinates
 	
 	glColor3f(+1.0f, +0.0f, +0.0f);
   glBegin(GL_QUADS); //Begin quadrilateral coordinates
@@ -96,7 +90,11 @@ void display(void)
   glColor3f(+0.25f, +0.25f, +0.25f);
   glutSolidCube(1.0);
   
-  glColor3f(+0.25f, +0.25f, +1.0f);
+  glLineWidth(5.0f);
+  glColor3f(+0.5f, +0.5f, +0.5f);
+  glutWireCube(1.0);
+  
+  glColor3f(+0.75f, +0.25f, +0.125f);
   Hexagon::Layout hexLayout = Hexagon::Layout(Hexagon::Layout::pointy, Hexagon::Point(1,1), Hexagon::Point(0,0));
   glBegin(GL_POLYGON);
     for (int i = 0; i < 6; ++i)
@@ -105,6 +103,17 @@ void display(void)
       glVertex3f(p.x, p.y, +0.0f);
     }
   glEnd();
+  
+  glLineWidth(5.0f);
+  glColor3f(+0.5f, +0.5f, +0.5f);
+  glBegin(GL_LINE_LOOP);
+    for (int i = 0; i < 6; ++i)
+    {
+      Hexagon::Point p = hexLayout.corner_offset(i);
+      glVertex3f(p.x, p.y, +0.0f);
+    }
+  glEnd();
+  
  
   //display
   glutSwapBuffers();
@@ -125,7 +134,7 @@ void reshape(int w, int h)
   GLfloat fov= 45.0; //The camera angle (field of view)
   //cameraPosition.z = (windowSize.y/100.0f/2.0f) / tan(fov/180.0f);
   // compute near and far plane
-  GLfloat nearPlane = 1.0f;// abs(cameraPosition.z/10.0f);
+  GLfloat nearPlane = 0.125f;// abs(cameraPosition.z/10.0f);
   GLfloat farPlane  = 100.0f;//abs(cameraPosition.z*10.0f);
   
   
@@ -149,6 +158,9 @@ void keyPressed(unsigned char key, int x, int y)
       glutLeaveMainLoop();
       return;
       break;
+    case 'p':
+    case 'P':
+      std::cout << "camera position: " << glm::to_string(cameraPosition) << std::endl;
     default:
       printf("Key pressed @ (%5d|%5d): 0x%02X %c \n", x, y, key, key);
       break;

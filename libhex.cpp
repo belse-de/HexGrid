@@ -1,5 +1,7 @@
 #include "libhex.hpp"
 
+#include <iostream>
+
 #include <cmath>
 #include <cstdlib>
 #include <cassert>
@@ -7,13 +9,14 @@
 #include <algorithm>
 #include <iterator>
 
+#include <glm/ext.hpp>
 
 using namespace Hexagon;
 //using std::abs;
 using std::max;
 //using std::vector;
 
-Point::Point(double x_, double y_): x(x_), y(y_) {}
+Point::Point(double x_, double y_): glm::f64vec2(x_,y_) {} // x(x_), y(y_) {}
 
 
 FractionalHex Point::hex(const Layout &layout)
@@ -27,45 +30,7 @@ FractionalHex Point::hex(const Layout &layout)
     return FractionalHex(q_, r_, -q_-r_);
 }
 
-
-/* FIXME
-template <typename T>
-Vec3<T>::Vec3() : Vec3<T>(0, 0, 0) {}
-*/
-
-template <typename T>
-Vec3<T>::Vec3(T q_, T r_, T s_): q(q_), r(r_), s(s_) {}
-
-template <typename T>
-Vec3<T> Vec3<T>::operator+ (const Vec3 &rhs) const 
-{
-    return Vec3(q + rhs.q, r + rhs.r, s + rhs.s);
-}
-
-template <typename T>
-Vec3<T> Vec3<T>::operator- (const Vec3 &rhs) const
-{
-    return Vec3(q - rhs.q, r - rhs.r, s - rhs.s);
-}
-
-template <typename T>
-Vec3<T> Vec3<T>::operator* (T rhs) const
-{
-    return Vec3(q * rhs, r * rhs, s * rhs);
-}
-
-template <typename T>
-bool Vec3<T>::operator == (const Vec3 &rhs) const
-{
-    return q == rhs.q && r == rhs.r && s == rhs.s;
-}
-
-template <typename T>
-bool Vec3<T>::operator != (const Vec3 &rhs) const
-{
-    return !(*this == rhs);
-}
-
+/*
 template <typename T>
 T Vec3<T>::length()
 {
@@ -77,11 +42,22 @@ T Vec3<T>::distance(const Vec3 &rhs) const
 {
     return (*this - rhs).length();
 }
+*/
 
-Hex::Hex(int q_, int r_, int s_) : Vec3<int>(q_, r_, s_) { assert( (q_ + r_ + s_) == 0); }
+Hex::Hex(int q_, int r_, int s_) : glm::i32vec3(q_, r_, s_) { assert( (q_ + r_ + s_) == 0); }
 
-Hex::Hex(const Vec3<int> &orig) : Vec3<int>(orig.q, orig.r, orig.s) {}
-Hex::Hex(const Hex &orig ) : Hex(static_cast<Vec3<int>>(orig)) {}
+Hex::Hex(const glm::i32vec3 &orig) : glm::i32vec3(orig) {}
+Hex::Hex(const Hex &orig ) : Hex(static_cast<glm::i32vec3>(orig)) {}
+
+int Hex::norm_hex(void) const
+{
+    return int((abs(x) + abs(y) + abs(z)) / 2);
+}
+
+int Hex::distance_hex(const Hex &rhs) const
+{
+    return Hex(*this - rhs).norm_hex();
+}
 
 const vector<Hex> Hex::directions = 
 {
@@ -129,9 +105,9 @@ Hex Hex::diagonal_neighbor(int direction)
 
 vector<Hex> Hex::drawLine(Hex to)
 {
-    int N = distance(to);
-    FractionalHex from_nudge = FractionalHex(   q + 0.000001,    r + 0.000001,    s - 0.000002);
-    FractionalHex to_nudge   = FractionalHex(to.q + 0.000001, to.r + 0.000001, to.s - 0.000002);
+    int N = distance_hex(to);
+    FractionalHex from_nudge = FractionalHex(   x + 0.000001,    y + 0.000001,    z - 0.000002);
+    FractionalHex to_nudge   = FractionalHex(to.x + 0.000001, to.y + 0.000001, to.z - 0.000002);
     vector<Hex> results = {};
     double step = 1.0 / max(N, 1);
     for (int i = 0; i <= N; i++)
@@ -146,8 +122,8 @@ Point Hex::point(const Layout &layout)
     Orientation M = layout.orientation;
     Point size = layout.size;
     Point origin = layout.origin;
-    double x_ = (M.f0 * q + M.f1 * r) * size.x;
-    double y_ = (M.f2 * q + M.f3 * r) * size.y;
+    double x_ = (M.f0 * x + M.f1 * y) * size.x;
+    double y_ = (M.f2 * x + M.f3 * y) * size.y;
     x_ = x_ + origin.x;
     y_ = y_ + origin.y;
     return Point(x_, y_);
@@ -168,33 +144,33 @@ vector<Point> Hex::polygon_corners(Layout layout)
 
 OffsetCoord Hex::hex2qoffset(int offset)
 {
-    int col = q;
-    int row = r + int((q + offset * (q & 1)) / 2);
+    int col = x;
+    int row = y + int((x + offset * (x & 1)) / 2);
     return OffsetCoord(col, row);
 }
 
 
 OffsetCoord Hex::hex2roffset(int offset)
 {
-    int col = q + int((r + offset * (r & 1)) / 2);
-    int row = r;
+    int col = x + int((y + offset * (y & 1)) / 2);
+    int row = y;
     return OffsetCoord(col, row);
 }
 
 
-FractionalHex::FractionalHex(double q_, double r_, double s_) : Vec3<double>(q_, r_, s_) {}
-FractionalHex::FractionalHex(const Vec3<double> &orig)      : Vec3<double>(orig.q, orig.r, orig.s) {}
-FractionalHex::FractionalHex(const FractionalHex &orig )   : FractionalHex( static_cast<Vec3<double>>(orig) ) {}
+FractionalHex::FractionalHex(double q_, double r_, double s_) : glm::f64vec3(q_, r_, s_) {}
+FractionalHex::FractionalHex(const glm::f64vec3 &orig)      : glm::f64vec3(orig.x, orig.y, orig.z) {}
+FractionalHex::FractionalHex(const FractionalHex &orig )   : FractionalHex( static_cast<glm::f64vec3>(orig) ) {}
 
 
 Hex FractionalHex::round2hex() const
 {
-    int tmp_q = int(round(q));
-    int tmp_r = int(round(r));
-    int tmp_s = int(round(s));
-    double q_diff = abs(tmp_q - q);
-    double r_diff = abs(tmp_r - r);
-    double s_diff = abs(tmp_s - s);
+    int tmp_q = int(round(x));
+    int tmp_r = int(round(y));
+    int tmp_s = int(round(z));
+    double q_diff = abs(tmp_q - x);
+    double r_diff = abs(tmp_r - y);
+    double s_diff = abs(tmp_s - z);
     if (q_diff > r_diff and q_diff > s_diff)
     {
         tmp_q = -tmp_r - tmp_s;
@@ -213,27 +189,27 @@ Hex FractionalHex::round2hex() const
 
 FractionalHex FractionalHex::lerp(const FractionalHex &rhs, double t) const
 {
-    return FractionalHex(q * (1. - t) + rhs.q * t, r * (1. - t) + rhs.r * t, s * (1. - t) + rhs.s * t);
+    return FractionalHex(x * (1. - t) + rhs.x * t, y * (1. - t) + rhs.y * t, z * (1. - t) + rhs.z * t);
 }
 
 
 
 
 
-OffsetCoord::OffsetCoord(int col_, int row_): col(col_), row(row_) {}
+OffsetCoord::OffsetCoord(int col_, int row_): glm::i32vec2(col_,row_) {} //col(col_), row(row_) {}
 
 Hex OffsetCoord::qoffset2hex(int offset)
 {
-    int q = col;
-    int r = row - int((col + offset * (col & 1)) / 2);
+    int q = x;
+    int r = y - int((x + offset * (x & 1)) / 2);
     int s = -q - r;
     return Hex(q, r, s);
 }
 
 Hex OffsetCoord::roffset2hex(int offset)
 {
-    int q = col - int((row + offset * (row & 1)) / 2);
-    int r = row;
+    int q = x- int((y + offset * (y & 1)) / 2);
+    int r = y;
     int s = -q - r;
     return Hex(q, r, s);
 }

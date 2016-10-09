@@ -5,6 +5,8 @@
 #include <vector>
 using std::vector;
 
+#include <glm/glm.hpp>
+
 namespace Hexagon
 {
   struct Layout;
@@ -29,10 +31,8 @@ namespace Hexagon
     
   };
   
-  struct Point
+  struct Point : public glm::f64vec2
   {
-    const double x;
-    const double y;
     Point(double x_, double y_);
     
     FractionalHex hex(const Layout &layout);
@@ -51,39 +51,18 @@ namespace Hexagon
     Point corner_offset(int corner);
   };
   
-   struct OffsetCoord
+   struct OffsetCoord : public glm::i32vec2
   {
-    const int col;
-    const int row;
     OffsetCoord(int col_, int row_);
     
     Hex qoffset2hex(int offset);
     Hex roffset2hex(int offset);
   };
   
-  template <typename T>
-  struct Vec3
-  {
-    const T q;
-    const T r;
-    const T s;
-    // Vec3(); FIXME
-    Vec3(T q_, T r_, T s_);
-
-    virtual Vec3 operator+  (const Vec3 &rhs) const;
-    virtual Vec3 operator-  (const Vec3 &rhs) const;
-    virtual Vec3 operator*  (T rhs) const;
-    virtual bool operator== (const Vec3 &rhs) const;
-    virtual bool operator!= (const Vec3 &rhs) const;
-      
-    T length();
-    T distance(const Vec3 &rhs) const;    
-  };
-  
-  struct Hex: public Vec3<int>
+  struct Hex: public glm::i32vec3
   {
     Hex(int q_, int r_, int s_);
-    Hex(const Vec3<int> &orig);
+    Hex(const glm::i32vec3 &orig);
     Hex(const Hex &orig );
     
     static const vector<Hex> directions;
@@ -91,6 +70,9 @@ namespace Hexagon
 
     static const vector<Hex> diagonals;
     static Hex diagonal(int diagonal);
+    
+    int norm_hex(void) const;
+    int distance_hex(const Hex &rhs) const;
     
     Hex neighbor(int direction);
     Hex diagonal_neighbor(int direction);
@@ -103,10 +85,10 @@ namespace Hexagon
     OffsetCoord hex2roffset(int offset);
   };
 
-  struct FractionalHex: public Vec3<double>
+  struct FractionalHex: public glm::f64vec3
   {
     FractionalHex(double q_, double r_, double s_);
-    FractionalHex(const Vec3<double> &orig);
+    FractionalHex(const glm::f64vec3 &orig);
     FractionalHex(const FractionalHex &orig );
     
     Hex round2hex() const;

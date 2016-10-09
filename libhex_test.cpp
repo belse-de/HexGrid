@@ -1,6 +1,7 @@
 // Tests
 
 #include <iostream>
+#include <glm/ext.hpp>
 
 #include "libhex.hpp"
 
@@ -11,15 +12,20 @@ void equal_Hex(const char* name, Hex a, Hex b)
     if ( not (a == b) )
     {
         fprintf(stderr, "%s\n",name);
+        std::cerr << glm::to_string(static_cast<glm::vec3>(a)) << std::endl;
+        std::cerr << glm::to_string(static_cast<glm::vec3>(b)) << std::endl;
     }
 }
 
 
 void equal_offsetcoord(const char* name, OffsetCoord a, OffsetCoord b)
 {
-    if ( not (a.col == b.col and a.row == b.row))
+    if ( not (a == b))
     {
         fprintf(stderr, "%s\n",name);
+        std::cerr << glm::to_string(static_cast<glm::vec2>(a)) << std::endl;
+        std::cerr << glm::to_string(static_cast<glm::vec2>(b)) << std::endl;
+        
     }
 }
 
@@ -29,6 +35,8 @@ void equal_int(const char* name, int a, int b)
     if ( not (a == b))
     {
         fprintf(stderr, "%s\n",name);
+        std::cerr << a << std::endl;
+        std::cerr << b << std::endl;
     }
 }
 
@@ -71,7 +79,7 @@ void test_hex_diagonal()
 
 void test_hex_distance()
 {
-    equal_int("hex_distance", 7, Hex(3, -7, 4).distance(Hex(0, 0, 0)));
+    equal_int("hex_distance", 7, Hex(3, -7, 4).distance_hex(Hex(0, 0, 0)));
 }
 
 

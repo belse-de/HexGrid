@@ -1,0 +1,8 @@
+# Suppressions
+# for LeakSanitizer to ignore certain leaks
+# If either function name, source file name or binary file name matches, 
+# the leak report will be suppressed.
+
+# graphic driver, xorg/xserver, opengl or glut errors
+leak:/usr/lib/xorg/modules/dri/i965_dri.so
+leak:/usr/lib/libdrm_intel.so
