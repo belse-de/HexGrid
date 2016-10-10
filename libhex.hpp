@@ -17,27 +17,28 @@ namespace Hexagon
   
   struct Orientation
   {
-    const double f0;
-    const double f1;
-    const double f2;
-    const double f3;
-    const double b0;
-    const double b1;
-    const double b2;
-    const double b3;
-    const double start_angle;
+    double f0;
+    double f1;
+    double f2;
+    double f3;
+    double b0;
+    double b1;
+    double b2;
+    double b3;
+    double start_angle;
     Orientation(
         double f0_, double f1_, double f2_, double f3_, 
         double b0_, double b1_, double b2_, double b3_, 
         double start_angle_);
-    
+    Orientation( const Orientation &o ); 
+    Orientation& operator=(const Orientation&);   
   };
   
   struct Point : public glm::f64vec2
   {
     Point(double x_, double y_);
     
-    FractionalHex hex(const Layout &layout);
+    FractionalHex hex(const Layout &layout) const;
   };
   
   struct Layout
@@ -45,13 +46,15 @@ namespace Hexagon
     static const Orientation pointy;
     static const Orientation flat;
     
-    const Orientation orientation;
-    const Point size;
-    const Point origin;
-    Layout(Orientation orientation_, Point size_, Point origin_);
+    Orientation orientation;
+    Point size;
+    Point origin;
+    Layout(Orientation orientation_=Layout::pointy, Point size_=Point(1,1), Point origin_=Point(0,0));
+    Layout& operator=(const Layout&);
     
     Point corner_offset(int corner) const;
   };
+  
   
    struct OffsetCoord : public glm::i32vec2
   {

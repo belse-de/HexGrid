@@ -19,7 +19,7 @@ using std::max;
 Point::Point(double x_, double y_): glm::f64vec2(x_,y_) {} // x(x_), y(y_) {}
 
 
-FractionalHex Point::hex(const Layout &layout)
+FractionalHex Point::hex(const Layout &layout) const
 {
     Orientation M = layout.orientation;
     Point size = layout.size;
@@ -122,8 +122,23 @@ Point Hex::point(const Layout &layout)
     Orientation M = layout.orientation;
     Point size = layout.size;
     Point origin = layout.origin;
+    
+    /*
+    std::cerr << __FUNCTION__ << ": " 
+        << glm::to_string(static_cast<glm::vec2>(size)) << std::endl;
+    std::cerr << __FUNCTION__ << ": " 
+        << glm::to_string(static_cast<glm::vec2>(origin)) << std::endl;
+    */
+    
     double x_ = (M.f0 * x + M.f1 * y) * size.x;
     double y_ = (M.f2 * x + M.f3 * y) * size.y;
+    /*
+    std::cerr << __FUNCTION__ << ": " << M.f0 << ":" << M.f1 <<std::endl;
+    std::cerr << __FUNCTION__ << ": " << M.f2 << ":" << M.f3 <<std::endl;
+    std::cerr << __FUNCTION__ << ": " << x    << ":" << y    <<std::endl;
+    std::cerr << __FUNCTION__ << ": " << x_   << ":" << y_   <<std::endl;
+    */
+    
     x_ = x_ + origin.x;
     y_ = y_ + origin.y;
     return Point(x_, y_);
@@ -134,6 +149,10 @@ vector<Point> Hex::polygon_corners(const Layout &layout)
 {
     vector<Point> corners = {};
     Point center = point(layout);
+    /*
+    std::cerr << __FUNCTION__ << ": " 
+        << glm::to_string(static_cast<glm::vec2>(center)) << std::endl;
+    */
     for (int i = 0; i < 6; i++)
     {
         Point offset = layout.corner_offset(i);
@@ -192,7 +211,14 @@ FractionalHex FractionalHex::lerp(const FractionalHex &rhs, double t) const
     return FractionalHex(x * (1. - t) + rhs.x * t, y * (1. - t) + rhs.y * t, z * (1. - t) + rhs.z * t);
 }
 
-
+const Orientation Layout::pointy = Orientation(sqrt(3.0), sqrt(3.0) / 2.0, 0.0, 
+          3.0 / 2.0, sqrt(3.0) / 3.0, -1.0 / 3.0, 
+          0.0, 2.0 / 3.0, 0.5);
+      
+const Orientation Layout::flat   = 
+        Orientation(3.0 / 2.0, 0.0, sqrt(3.0) / 2.0, 
+          sqrt(3.0), 2.0 / 3.0, 0.0, 
+          -1.0 / 3.0, sqrt(3.0) / 3.0, 0.0);
 
 
 
@@ -223,12 +249,29 @@ Orientation::Orientation(
         b0(b0_), b1(b1_), b2(b2_), b3(b3_), 
         start_angle(start_angle_) {}
 
-
-const Orientation Layout::pointy = Orientation(sqrt(3.0), sqrt(3.0) / 2.0, 0.0, 3.0 / 2.0, sqrt(3.0) / 3.0, -1.0 / 3.0, 0.0, 2.0 / 3.0, 0.5);
-const Orientation Layout::flat   = Orientation(3.0 / 2.0, 0.0, sqrt(3.0) / 2.0, sqrt(3.0), 2.0 / 3.0, 0.0, -1.0 / 3.0, sqrt(3.0) / 3.0, 0.0);
+Orientation::Orientation( const Orientation &o ): 
+        f0(o.f0), f1(o.f1), f2(o.f2), f3(o.f3), 
+        b0(o.b0), b1(o.b1), b2(o.b2), b3(o.b3), 
+        start_angle(o.start_angle) {}
+        
+Orientation& Orientation::operator=(const Orientation& o)
+{
+    f0 = o.f0; f1 = o.f1; f2 = o.f2; f3 = o.f3; 
+    b0 = o.b0; b1 = o.b1; b2 = o.b2; b3 =o.b3;
+    start_angle = o.start_angle;
+    return *this;
+}
 
 Layout::Layout(Orientation orientation_, Point size_, Point origin_): 
         orientation(orientation_), size(size_), origin(origin_) {}
+
+Layout& Layout::operator=(const Layout &rhs)
+{
+  orientation = rhs.orientation;
+  size = rhs.size;
+  origin = rhs.origin;
+  return *this;
+}
         
 Point Layout::corner_offset(int corner) const
 {

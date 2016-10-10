@@ -26,44 +26,51 @@ static glm::vec3 cameraUp       = glm::vec3(0, 1, 0);
 static std::string title = "Hex Test";
 
 static int map_radius = 20;
-static std::unordered_map<Hexagon::Hex, glm::vec3> map;
+static std::unordered_map<Hexagon::Hex, glm::vec4> map;
+static Hexagon::Layout map_layout;
 
 // display callback for GLUT
 void display(void);
 void reshape(int w, int h);
 void keyPressed(unsigned char key, int x, int y);
 void specialKeysPressed(int key, int x, int y);
+void mousePressed(int button, int state, int x, int y);
 
 int main(int argc, char **argv) 
 {
   // create window with glut
   glutInit(&argc, argv);
-  glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH );
+  glutInitDisplayMode( GLUT_DOUBLE | GLUT_ALPHA | GLUT_RGBA | GLUT_DEPTH );
   glutInitWindowSize(windowSize.x, windowSize.y);
-  glutInitWindowPosition(windowPosition.x, windowPosition.y);
+  //glutInitWindowPosition(windowPosition.x, windowPosition.y);
   windowID = glutCreateWindow(title.c_str());
   
   //Makes 3D drawing work when something is in front of something else
   glDepthMask(GL_TRUE);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_LINE_SMOOTH);
+	glEnable(GL_POLYGON_SMOOTH);
 	glClearColor(0.0,0.0,0.0,0.0);
   
   // register callbacks
+  // display
   glutDisplayFunc(display);
   glutReshapeFunc(reshape);
-
+  // input
   glutKeyboardFunc(keyPressed);
   glutSpecialFunc(specialKeysPressed);
+  glutMouseFunc(mousePressed);
+  
 # if 0
   glutMotionFunc(mouseMoved);
-  glutMouseFunc(mousePressed);
+  
   glutCreateMenu(menu);
   glutAttachMenu(GLUT_RIGHT_BUTTON);
 # endif
 
-  // MAP init 
-  //  std::make_pair<std::string,double>("eggs",6.0)
-  
+  // MAP init  
+  srand(0); 
+  map_layout = Hexagon::Layout(Hexagon::Layout::pointy, Hexagon::Point(1,1), Hexagon::Point(0,0));
   for (int q = -map_radius; q <= map_radius; q++) {
     int r1 = max(-map_radius, -q - map_radius);
     int r2 = min(map_radius, -q + map_radius);
@@ -72,9 +79,11 @@ int main(int argc, char **argv)
       float c_r = 0.5f*q/map_radius+0.5f;
       float c_g = 0.5f*r/map_radius+0.5f;
       float c_b = 0.5f*s/map_radius+0.5f;
+      float c_rand = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
       map.insert(
-        std::make_pair<Hexagon::Hex,glm::vec3>(
-          Hexagon::Hex(q, r, s), glm::vec3( c_r, c_g, c_b)
+        std::make_pair<Hexagon::Hex,glm::vec4>(
+          Hexagon::Hex(q, r, s), 
+          glm::vec4( c_r, c_g, c_b, c_rand)
         )
       );
     }
@@ -116,7 +125,7 @@ void display(void)
   glColor3f(+0.25f, +0.25f, +0.25f);
   glutSolidCube(1.0);
   
-  glLineWidth(5.0f);
+  glLineWidth(1.0f);
   glColor3f(+0.5f, +0.5f, +0.5f);
   glutWireCube(1.0);
   
@@ -126,33 +135,28 @@ void display(void)
     for (int r = r1; r <= r2; r++) {
       int s = -q-r;
       Hexagon::Hex field = Hexagon::Hex(q, r, s);
-      glm::vec3 colour = map[field];
-
-      Hexagon::Layout hexLayout = 
-          Hexagon::Layout(
-            Hexagon::Layout::pointy, 
-            Hexagon::Point(1,1), 
-            Hexagon::Point(0,0));
-            
-      vector<Hexagon::Point> corners = field.polygon_corners(hexLayout);
+      glm::vec4 colour = map[field];
+      //Hexagon::Layout map_layout_loc = Hexagon::Layout(
+      //      Hexagon::Layout::pointy, Hexagon::Point(1,1), Hexagon::Point(0,0));         
+      vector<Hexagon::Point> corners = field.polygon_corners(map_layout);
             
       glColor3f(colour.x, colour.y, colour.z);
       glBegin(GL_POLYGON);
         for (auto p : corners)
         {
-          glVertex2f(p.x, p.y);
+          glVertex3f(p.x, p.y, colour.w);
         }
       glEnd();
       
-      glLineWidth(3.0f);
+      glLineWidth(1.0f);
       glColor3f(+0.25f, +0.25f, +0.25f);
-      glBegin(GL_LINE_STRIP);
-        for (int i=0; i<4; i++)
+      glBegin(GL_LINE_LOOP);
+        for (auto p : corners)
         {
-          auto p = corners[i];
-          glVertex2f(p.x, p.y);
+          glVertex3f(p.x, p.y, colour.w);
         }
       glEnd();
+
       glLineWidth(1.0f);
       
     }
@@ -207,6 +211,7 @@ void keyPressed(unsigned char key, int x, int y)
     case 'p':
     case 'P':
       std::cout << "camera position: " << glm::to_string(cameraPosition) << std::endl;
+      break;
     default:
       printf("Key pressed @ (%5d|%5d): 0x%02X %c \n", x, y, key, key);
       break;
@@ -267,10 +272,71 @@ void specialKeysPressed(int key, int x, int y)
   glutPostRedisplay();
 }
 
+glm::vec3 GetOGLPos(int x, int y)
+{
+    GLint viewport[4];         // Where The Viewport Values Will Be Stored (x,y,w,h)
+    GLdouble modelview[16];    // Where The 16 Doubles Of The Modelview Matrix Are To Be Stored
+    GLdouble projection[16];   // Where The 16 Doubles Of The Projection  Matrix Are To Be Stored
+    GLfloat winX, winY, winZ;  // Holds Our X, Y and Z Coordinates
+    GLdouble posX, posY, posZ; // Hold The Final Values
+ 
+    glGetDoublev( GL_MODELVIEW_MATRIX, modelview ); // Retrieve The Modelview Matrix
+    glGetDoublev( GL_PROJECTION_MATRIX, projection ); // Retrieve The Projection Matrix
+    glGetIntegerv( GL_VIEWPORT, viewport ); // Retrieves The Viewport Values (X, Y, Width, Height)
+ 
+    winX = (float)x;
+    winY = (float)viewport[3] - (float)y; // Subtract The Current Mouse Y Coordinate From The Screen Height.
+    glReadPixels( x, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ ); // get winZ
+ 
+    gluUnProject( winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
+    
+    /*
+    gluUnProject( (GLdouble) x, (GLdouble) realy, 0.0, mvmatrix,
+        projmatrix, viewport, &wx1, &wy1, &wz1 );
+    gluUnProject( (GLdouble) x, (GLdouble) realy, 1.0, mvmatrix,
+        projmatrix, viewport, &wx2, &wy2, &wz2 );
+    */
+ 
+    return glm::vec3(posX, posY, posZ);
+}
+
+void mousePressed(int button, int state, int x, int y)
+{
+  //3d Normalised Device Coordinates
+  float ray_x = -1.0f + (2.0f * x) / windowSize.x ;
+  float ray_y = +1.0f - (2.0f * y) / windowSize.y;
+  float ray_z = +1.0f;
+  glm::vec3 ray_nds = glm::vec3(ray_x, ray_y, ray_z);
+  //4d Homogeneous Clip Coordinates
+  glm::vec4 ray_clip = glm::vec4(ray_nds.x, ray_nds.y, -1.0, 1.0);
+
+
+  switch(button)
+  {
+    case GLUT_LEFT_BUTTON:
+      if(state == GLUT_DOWN)
+      {
+        glm::vec3 target = GetOGLPos (x,y);
+        Hexagon::Point target_map = Hexagon::Point(target.x, target.y);
+        Hexagon::FractionalHex target_hex_f = target_map.hex( map_layout );
+        Hexagon::Hex target_hex = target_hex_f.round2hex();
+
+        map[target_hex].r = 1.f;
+        map[target_hex].g = 1.f;
+        map[target_hex].b = 1.f;
+        glutPostRedisplay();
+      } // else GLUT_UP
+      break;
+    case GLUT_MIDDLE_BUTTON:
+    case GLUT_RIGHT_BUTTON:
+    default:
+      printf("Mouse Key pressed @ (%5d|%5d): button: 0x%02X state: 0x%01X\n", x, y, button, state);
+      break;
+  }
+}
+
 /*
  GLUT_KEY_REPEAT_OFF:0x0000, GLUT_KEY_REPEAT_ON:0x0001, GLUT_KEY_REPEAT_DEFAULT:0x0002.
-
-mouse clicks can be handled with the glutMouseFunc and the constants associated with the mouse buttons are: GLUT_LEFT_BUTTON:0x0000, GLUT_MIDDLE_BUTTON:0x0001, GLUT_RIGHT_BUTTON:0x0002
 
 glut can also handle joysticks with the glutJoystickFunc which has the following constants: GLUT_HAS_JOYSTICK:0x0264, GLUT_OWNS_JOYSTICK:0x0265, GLUT_JOYSTICK_BUTTONS:0x0266, GLUT_JOYSTICK_AXES:0x0267, GLUT_JOYSTICK_POLL_RATE:0x0268, GLUT_JOYSTICK_BUTTON_A:0x0001, GLUT_JOYSTICK_BUTTON_B:0x0002, GLUT_JOYSTICK_BUTTON_C:0x0004, GLUT_JOYSTICK_BUTTON_D:0x0008.
 
