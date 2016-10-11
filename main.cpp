@@ -1,5 +1,5 @@
-#include <iostream>
 #include <string>
+#include <iostream>
 #include <unordered_map>
 
 #include <cstdlib>
@@ -45,13 +45,6 @@ int main(int argc, char **argv)
   //glutInitWindowPosition(windowPosition.x, windowPosition.y);
   windowID = glutCreateWindow(title.c_str());
   
-  //Makes 3D drawing work when something is in front of something else
-  glDepthMask(GL_TRUE);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_LINE_SMOOTH);
-	glEnable(GL_POLYGON_SMOOTH);
-	glClearColor(0.0,0.0,0.0,0.0);
-  
   // register callbacks
   // display
   glutDisplayFunc(display);
@@ -59,14 +52,22 @@ int main(int argc, char **argv)
   // input
   glutKeyboardFunc(keyPressed);
   glutSpecialFunc(specialKeysPressed);
-  glutMouseFunc(mousePressed);
-  
+  glutMouseFunc(mousePressed);  
 # if 0
   glutMotionFunc(mouseMoved);
-  
   glutCreateMenu(menu);
   glutAttachMenu(GLUT_RIGHT_BUTTON);
 # endif
+  
+  //Makes 3D drawing work when something is in front of something else
+  glDepthMask(GL_TRUE);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_LINE_SMOOTH);
+	glEnable(GL_POLYGON_SMOOTH);
+	glClearColor(0.0,0.0,0.0,0.0);
+  
+
+
 
   // MAP init  
   srand(0); 
@@ -321,14 +322,16 @@ void mousePressed(int button, int state, int x, int y)
         Hexagon::FractionalHex target_hex_f = target_map.hex( map_layout );
         Hexagon::Hex target_hex = target_hex_f.round2hex();
 
-        map[target_hex].r = 1.f;
-        map[target_hex].g = 1.f;
-        map[target_hex].b = 1.f;
+        map[target_hex].r = 1.f - map[target_hex].r ;
+        map[target_hex].g = 1.f - map[target_hex].g ;
+        map[target_hex].b = 1.f - map[target_hex].b ;
         glutPostRedisplay();
       } // else GLUT_UP
       break;
     case GLUT_MIDDLE_BUTTON:
     case GLUT_RIGHT_BUTTON:
+    case 0x3: // scrole up   - is pressed and released alternatingly
+    case 0x4: // scrole down - is pressed and released alternatingly
     default:
       printf("Mouse Key pressed @ (%5d|%5d): button: 0x%02X state: 0x%01X\n", x, y, button, state);
       break;
