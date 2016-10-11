@@ -38,6 +38,8 @@ IF(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUXX)
 ENDIF(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUXX)
 
 set( SOURCES
+  src/Hexagon/libhex.cpp
+  src/Hexagon/libhex.hpp
 )
 
 # https://cmake.org/cmake/help/v3.0/module/FindOpenGL.html
