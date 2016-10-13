@@ -18,33 +18,42 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 // Window dimensions
 const GLuint WIDTH = 800, HEIGHT = 600;
 GLfloat vertices[] = {
-     0.5f,  0.5f, 0.0f,  // Top Right
-     0.5f, -0.5f, 0.0f,  // Bottom Right
-    -0.5f, -0.5f, 0.0f,  // Bottom Left
-    -0.5f,  0.5f, 0.0f,  // Top Left 
-     0.0f,  0.0f, 0.0f,  // Center
+  // position           // color
+   0.5f,  0.5f, 0.0f,   //+1.0f, +0.0f, +0.0f, // Top Right
+   0.5f, -0.5f, 0.0f,   //+0.0f, +1.0f, +0.0f, // Bottom Right
+  -0.5f, -0.5f, 0.0f,   //+0.0f, +0.0f, +1.0f, // Bottom Left
+  -0.5f,  0.5f, 0.0f,   //+1.0f, +1.0f, +0.0f, // Top Left 
+   0.0f,  0.0f, 0.0f,   //+0.0f, +1.0f, +1.0f, // Center
 };
 GLuint indices[] = {  // Note that we start from 0!
-    0, 4, 3,   // First Triangle
-    1, 2, 4    // Second Triangle
+    0, 1, 2,   // First Triangle
+    4, 3, 2    // Second Triangle
 };  
 
 static const GLchar* vertexShaderSource =
 "#version 330 core\n"    
-"  layout (location = 0) in vec3 position;\n"
+"layout (location = 0) in vec3 position; // The position variable has attribute position 0\n"
 "\n"
-"  void main()\n"
-"  {\n"
-"      gl_Position = vec4(position.x, position.y, position.z, 1.0);\n"
-"  }\n";
-
-static const GLchar* fragmentShaderSource =
-"#version 330 core\n"
-"out vec4 color;\n"
+"out vec4 vertexColor; // Specify a color output to the fragment shader\n"
 "\n"
 "void main()\n"
 "{\n"
-"    color = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+"  gl_Position = vec4(position, 1.0); // See how we directly give a vec3 to vec4's constructor\n"
+"  vertexColor = vec4(0.5f, 0.0f, 0.0f, 1.0f); // Set the output variable to a dark-red color\n"
+"}\n";
+
+static const GLchar* fragmentShaderSource =
+"#version 330 core\n"
+//"in vec4 vertexColor; // The input variable from the vertex shader (same name and same type)\n"
+"\n"
+"out vec4 color;\n"
+"\n"
+"uniform vec4 ourColor; // We set this variable in the OpenGL code.\n"
+"\n"
+"void main()\n"
+"{\n"
+//"  color = vertexColor;\n"
+"  color = ourColor;\n"
 "}\n";
 
 int main(int argc, char **argv, char **env)
@@ -80,6 +89,9 @@ int main(int argc, char **argv, char **env)
   glfwGetFramebufferSize(window, &width, &height);
   glViewport(0, 0, width, height);
   
+  GLint nrAttributes;
+  glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
+  cout << "Maximum nr of vertex attributes supported: " << nrAttributes << endl;
   
   
   GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -157,16 +169,22 @@ int main(int argc, char **argv, char **env)
     glClear(GL_COLOR_BUFFER_BIT);
     
     // Rendering commands here  
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); 
+    // Be sure to activate the shader
     glUseProgram(shaderProgram);
-    glBindVertexArray(VAO);
+
+    
+    // Update the uniform color
+    GLfloat timeValue = glfwGetTime();
+    GLfloat greenValue = (sin(timeValue) / 2) + 0.5;
+    GLint vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+    glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+    
     
     // DRAW CODE
+    glBindVertexArray(VAO);
     //glDrawArrays(GL_TRIANGLES, 0, 3);
     //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
     glBindVertexArray(0);
     
     // Swap the buffers
@@ -188,4 +206,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
   // closing the application
   if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
   	glfwSetWindowShouldClose(window, GL_TRUE);
+  else if(key == GLFW_KEY_F && action == GLFW_PRESS)
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  else if(key == GLFW_KEY_L && action == GLFW_PRESS)
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
