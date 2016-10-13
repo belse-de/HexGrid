@@ -40,6 +40,7 @@ ENDIF(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUXX)
 set( SOURCES
   src/Hexagon/libhex.cpp
   src/Hexagon/libhex.hpp
+  src/main.cpp
 )
 
 # https://cmake.org/cmake/help/v3.0/module/FindOpenGL.html
@@ -53,7 +54,7 @@ pkg_search_module(GLFW REQUIRED glfw3)
 include_directories( ${PROJECT_SOURCE_DIR}/inc ${OPENGL_INCLUDE_DIR} ${GLEW_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS})
 
 add_executable(${PROJECT_NAME} ${SOURCES})
-target_link_libraries(test ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${GLFW_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${GLFW_LIBRARIES})
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY C_STANDARD   11)
 set_property(TARGET ${PROJECT_NAME} PROPERTY C_STANDARD_REQUIRED   ON)

@@ -273,6 +273,8 @@ void specialKeysPressed(int key, int x, int y)
   glutPostRedisplay();
 }
 
+//src: 2016-10-12 https://www.opengl.org/archives/resources/faq/technical/selection.htm#sele0010
+//src: 2016-10-12 http://nehe.gamedev.net/article/using_gluunproject/16013/
 glm::vec3 GetOGLPos(int x, int y)
 {
     GLint viewport[4];         // Where The Viewport Values Will Be Stored (x,y,w,h)

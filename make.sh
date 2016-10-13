@@ -8,9 +8,10 @@ cd build
 ninja
 cd ..
 
-echo -e "        run        "
+echo -e "\n        run        "
 echo -e "---- ---- ---- ----"
 
-LSAN_OPTIONS=suppressions=suppress.txt ./build/main
-echo -e "\n  Exit Code: " $?
+LSAN_OPTIONS=suppressions=suppress.txt ./build/Hexagon
+echo -e "\n---- ---- ---- ----"
+echo -e "   Exit Code: " $?
 
