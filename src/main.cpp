@@ -73,6 +73,7 @@ int main(int argc, char **argv, char **env)
   
   Shader vertexShader   = Shader("shader/shader.vs",   GL_VERTEX_SHADER);
   Shader fragmentShader = Shader("shader/shader.frag", GL_FRAGMENT_SHADER);
+  //std::vector<Shader> shaders = {vertexShader, fragmentShader};
   std::vector<GLuint> shaders = {vertexShader.ShaderID, fragmentShader.ShaderID};
   
   ShaderProgram shaderProgram = ShaderProgram(shaders);

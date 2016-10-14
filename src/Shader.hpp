@@ -19,20 +19,13 @@ class Shader
     GLenum type;
 };
 
-
-
-
-
-
-
-
-
 class ShaderProgram
 {
   public:
 	  // The program ID
 	  GLuint ProgramID;
 	  // Constructor reads and builds the shader
+	  //ShaderProgram(std::vector<Shader> shaders);
 	  ShaderProgram(std::vector<GLuint> shaders);
 	  virtual ~ShaderProgram();
 	  // Use the program

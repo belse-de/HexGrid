@@ -47,11 +47,15 @@ Shader::~Shader()
 }
 
 ShaderProgram::ShaderProgram(std::vector<GLuint> shaders)
+//ShaderProgram::ShaderProgram(std::vector<Shader> shaders)
 {      
   // Shader Program
   ProgramID = glCreateProgram();
   for( auto shader : shaders)
   {
+    //std::cerr << ProgramID << " : " << shader.ShaderID << std::endl;
+    //glAttachShader(ProgramID, );
+    std::cerr << ProgramID << " : " << shader << std::endl;
     glAttachShader(ProgramID, shader);
   }
   
