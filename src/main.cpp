@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include "Hexagon/libhex.hpp"
+#include "Shader.hpp"
 
 using namespace std;
 using namespace glm;
@@ -19,42 +20,18 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 const GLuint WIDTH = 800, HEIGHT = 600;
 GLfloat vertices[] = {
   // position           // color
-   0.5f,  0.5f, 0.0f,   //+1.0f, +0.0f, +0.0f, // Top Right
-   0.5f, -0.5f, 0.0f,   //+0.0f, +1.0f, +0.0f, // Bottom Right
-  -0.5f, -0.5f, 0.0f,   //+0.0f, +0.0f, +1.0f, // Bottom Left
-  -0.5f,  0.5f, 0.0f,   //+1.0f, +1.0f, +0.0f, // Top Left 
-   0.0f,  0.0f, 0.0f,   //+0.0f, +1.0f, +1.0f, // Center
+   0.5f,  0.5f, 0.0f,   +1.0f, +0.0f, +0.0f, // Top Right
+   0.5f, -0.5f, 0.0f,   +0.0f, +1.0f, +0.0f, // Bottom Right
+  -0.5f, -0.5f, 0.0f,   +0.0f, +0.0f, +1.0f, // Bottom Left
+  -0.5f,  0.5f, 0.0f,   +1.0f, +1.0f, +0.0f, // Top Left 
+   0.0f,  0.0f, 0.0f,   +0.0f, +1.0f, +1.0f, // Center
 };
 GLuint indices[] = {  // Note that we start from 0!
     0, 1, 2,   // First Triangle
     4, 3, 2    // Second Triangle
 };  
 
-static const GLchar* vertexShaderSource =
-"#version 330 core\n"    
-"layout (location = 0) in vec3 position; // The position variable has attribute position 0\n"
-"\n"
-"out vec4 vertexColor; // Specify a color output to the fragment shader\n"
-"\n"
-"void main()\n"
-"{\n"
-"  gl_Position = vec4(position, 1.0); // See how we directly give a vec3 to vec4's constructor\n"
-"  vertexColor = vec4(0.5f, 0.0f, 0.0f, 1.0f); // Set the output variable to a dark-red color\n"
-"}\n";
 
-static const GLchar* fragmentShaderSource =
-"#version 330 core\n"
-//"in vec4 vertexColor; // The input variable from the vertex shader (same name and same type)\n"
-"\n"
-"out vec4 color;\n"
-"\n"
-"uniform vec4 ourColor; // We set this variable in the OpenGL code.\n"
-"\n"
-"void main()\n"
-"{\n"
-//"  color = vertexColor;\n"
-"  color = ourColor;\n"
-"}\n";
 
 int main(int argc, char **argv, char **env)
 {
@@ -94,42 +71,11 @@ int main(int argc, char **argv, char **env)
   cout << "Maximum nr of vertex attributes supported: " << nrAttributes << endl;
   
   
-  GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-  glCompileShader(vertexShader);
-  GLint success;
-  GLchar infoLog[512];
-  glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-  if(!success)
-  {
-      glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-      std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-      exit(EXIT_FAILURE);
-  }
+  Shader vertexShader   = Shader("shader/shader.vs",   GL_VERTEX_SHADER);
+  Shader fragmentShader = Shader("shader/shader.frag", GL_FRAGMENT_SHADER);
+  std::vector<GLuint> shaders = {vertexShader.ShaderID, fragmentShader.ShaderID};
   
-  GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-  glCompileShader(fragmentShader);
-  glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-  if(!success)
-  {
-      glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-      std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-      exit(EXIT_FAILURE);
-  }
-  
-  GLuint shaderProgram = glCreateProgram();
-  glAttachShader(shaderProgram, vertexShader);
-  glAttachShader(shaderProgram, fragmentShader);
-  glLinkProgram(shaderProgram);
-  glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-  if(!success) {
-      glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-      std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << infoLog << std::endl;
-      exit(EXIT_FAILURE);
-  }
-  glDeleteShader(vertexShader);
-  glDeleteShader(fragmentShader);  
+  ShaderProgram shaderProgram = ShaderProgram(shaders);
   
   
   
@@ -151,8 +97,12 @@ int main(int argc, char **argv, char **env)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
     // Then set the vertex attributes pointers
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-    glEnableVertexAttribArray(0); 
+    // Position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
+    glEnableVertexAttribArray(0);
+    // Color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3* sizeof(GLfloat)));
+    glEnableVertexAttribArray(1);
   // Unbind the VAO (NOT the EBO)
   glBindVertexArray(0);
   
@@ -170,13 +120,13 @@ int main(int argc, char **argv, char **env)
     
     // Rendering commands here  
     // Be sure to activate the shader
-    glUseProgram(shaderProgram);
+    shaderProgram.use();
 
     
     // Update the uniform color
     GLfloat timeValue = glfwGetTime();
     GLfloat greenValue = (sin(timeValue) / 2) + 0.5;
-    GLint vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+    GLint vertexColorLocation = glGetUniformLocation(shaderProgram.ProgramID, "ourColor");
     glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
     
     
